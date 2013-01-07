@@ -1,2 +1,4 @@
 sample_scores
 *.wav
+*~
+*.pyc

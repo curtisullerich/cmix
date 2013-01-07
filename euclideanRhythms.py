@@ -13,7 +13,7 @@ def man():
 
   pattern1 = bjorklund(16, 5)
   pattern2 = bjorklund(17, 7)
-  pattern3 = bjorklund( 7, 3)
+  pattern3 = bjorklund( 5, 2)
 
   st = 0
   for i in range(1000):
@@ -26,7 +26,7 @@ def man():
     if (pattern3[i % len(pattern3)] == 1):
       pitch = 9
       STRUM2(st, dur, amp, pitch, squish, decay, pan3)
-    st += .2
+    st += .15
 
 #implementation copyright (c) 2011 Brian House
 def bjorklund(steps, pulses):

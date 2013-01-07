@@ -1,12 +1,15 @@
 from rtcmix import *
 from metalib import *
 import math
+import random
 #print_off()
 rtsetparams(44100, 2)
 load("STRUM2")
 
 """
 from Chapter 16 (Mapping) of Notes from the Metalevel
+
+Note that I didn't implement the envelop examples.
 """
 
 #plays notes on the STRUM2 instrument along a sine wave
@@ -40,18 +43,25 @@ def sschop (value, segments, levels):
 def sierpinski(tone, melody, levels, dur, amp, pulse, timepoint):
   length = len(melody)
   for i in melody:
-    k=tone+i#tone is the base pitch. Transpose I above tone
+    k=tone+i #tone is the base pitch. Transpose I above tone
     print "i=%i length=%i k=%i" % (i, length, k)    
     STRUM2(timepoint, dur, amp, keynumToHertz(k), 1, 1.0, 0.5)
     if (levels > 1):
-      sierpinski(k+12, melody, levels-1, float(dur)/float(length), amp*.8, float(pulse)/float(length), timepoint)
+      sierpinski(k, melody, levels-1, float(dur)/float(length), amp*.8, float(pulse)/float(length), timepoint)
     timepoint = timepoint + pulse
 
-#length, cycles, lower key, higher key, pulse value, note duration, amplitude
+
+
+"""some defaults for you to try"""
 #playsine(100, 4, 80, 100, .1, .3, 10000)
-#playsine(100, 4, 50, 80, .1, .3,  9500)
+#playsine(100, 4, 50,  80, .1, .3,  9500)
 
 #print str(sschop(8, 2, 4))
-pulse = 1
-sierpinski(40, [0, 4, 8], 4, 3, 10000, 3, 0)
+#print str(sschop(440 2 0))
+#print str(sschop(440 2 3))
+#print str(sschop 36 3 3))
+
+#sierpinski(60,               [0, 7, 5], 4,  3, 10000, 1, 0)
+#sierpinski(60,          [0, -1, 2, 13], 5, 24, 10000, 1, 0)
+#sierpinski(40, [0, 2, 4, 6, 8, 10, 12], 3,  3, 10000, 1, 0)
 
