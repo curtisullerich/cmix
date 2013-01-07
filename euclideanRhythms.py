@@ -11,17 +11,17 @@ def man():
   pan2 = .5
   pan3 = .9
 
-  pattern1 = bjorklund(8,3)
-  pattern2 = bjorklund(8,4)
-  pattern3 = bjorklund(8,5)
+  pattern1 = bjorklund(16, 5)
+  pattern2 = bjorklund(17, 7)
+  pattern3 = bjorklund( 7, 3)
 
   st = 0
   for i in range(1000):
     if (pattern1[i % len(pattern1)] == 1):
-      pitch = 8
+      pitch = 7
       STRUM2(st, dur, amp, pitch, squish, decay, pan1)
     if (pattern2[i % len(pattern2)] == 1):
-      pitch = 7
+      pitch = 8
       STRUM2(st, dur, amp, pitch, squish, decay, pan2)
     if (pattern3[i % len(pattern3)] == 1):
       pitch = 9
