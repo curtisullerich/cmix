@@ -60,3 +60,8 @@ class Drunk:
     self.cur = next
     return int(next)
 
+def bpmToSeconds(bpm):
+  return 60.0/float(bpm)
+  
+def rhythmToSeconds(rhy, tempo):
+  return rhy * 4.0 * bpmToSeconds(tempo)
