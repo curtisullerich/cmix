@@ -74,6 +74,9 @@ def markovRhythms(length, quarterNote, tbl):
     timepoint += dur
 
 def markovChorder(length, intmix, note, size, ud, rhy, dur, begin):
+  """
+  Uses markov chains to play a sequence of chords.
+  """
   intt = begin
   key = note
   chord = False
@@ -106,6 +109,10 @@ def selectNextFromDict(table, past):
   lesum = 0
   print "past: " + str(past)
   print "dict: " + str(table.get(past))
+
+  if table[past] == {}:
+    return ()
+
   for val in table[past].values():
     lesum += val
   print "lesum: " + str(lesum)
@@ -119,7 +126,7 @@ def selectNextFromDict(table, past):
     if (r < rsum):
       print "return " + str(key)
       return key
-  #give up and return the last one
+
   raise Exception("didn't work!")
   #return table.items().pop()
 
@@ -166,11 +173,26 @@ def bw(length, octave, rate, octaves, intervals):
     timepoint += rate
     reps -= 1
 
+#I really need to implement a note name parser
 bdaynames = ['c4', 'c', 'd', 'c', 'f', 'e', 'c', 'c', 'd', 'c', 'g', 'f', 'c', 'c', 'c5', 'a4', 'f', 'e', 'd', 'bf', 'bf', 'a', 'f', 'g', 'f']
-bday = [60, 60, 62, 60, 65, 64, 60, 60, 62, 60, 67, 65, 60, 60, 72, 69, 66, 64, 62, 70, 70, 69, 66, 67, 66]
+bday =      [  60,  60,  62,  60,  65,  64,  60,  60,  62,  60,  67,  65,  60,  60,   72,   69,  65,  63,  62,   70,   70,  69,  65,  67, 65]
+amazinggracenames = ['G', 'C', 'C', 'E', 'D', 'C', 'E', 'E', 'D', 'C', 'A', 'G', 'G', 'C', 'C', 'E', 'D', 'C', 'E', 'D', 'E', 'G', 'E', 'G', 'G', 'E', 'D', 'C', 'E', 'E', 'D', 'C', 'A', 'G', 'G', 'G', 'C', 'C', 'E', 'D', 'C', 'E', 'D', 'C']
+grace = [67, 60, 60, 64, 62, 60, 64, 64, 62, 60, 69, 67, 67, 60, 60, 64, 62, 60, 64, 62, 64, 67, 64, 67, 67, 64, 62, 60, 64, 64, 62, 60, 69, 67, 67, 67, 60, 60, 64, 62, 60, 64, 62, 60]
 
-def markovanalyzeFirstOrder(seq, order):
-  """first order first"""
+def playnotes(seq, rate):
+  """Simple function that plays a sequence of notes (given as keynumbers)."""
+  timepoint = 0
+  dur = rate * 1.5
+  for note in seq:
+    STRUM2(timepoint, dur, 10000, keynumToHertz(note), 1, 1.0, 0.5)
+    timepoint += rate
+
+#playnotes(grace, .5)
+
+def markovanalyzeZerothOrder(seq, order):
+  """This is a basic implementation of zeroth-order markov chaining
+  that could be more helpful in understanding how it works for
+  a more complex application. """
   pat = dict()
   for i in range(len(seq)-1):
     if (seq[i] in pat):
@@ -188,7 +210,33 @@ def markovanalyzeFirstOrder(seq, order):
   return pat
 
 def markovanalyze(seq, order):
-  """nth order"""
+  """Performs nth-order markov chaining. Returns a dictionary of dictionaries
+  dictionaries that hold the occurrence counts for each note pattern and *not*
+  the actual probabilities. Use selectNextFromDict(...) to choose the next note 
+  using the weighted probabilities.
+  
+  Examples:
+  
+  markovanalyze([1,2,1,2,3],0)
+  {
+  (2,): {1: 1, 3: 1}, 
+  (3,): {}, 
+  (1,): {2: 2}
+  }
+
+  markovanalyze([1,2,1,2,3],1)
+  {
+  (1, 2): {1: 1, 3: 1}, 
+  (2, 3): {}, 
+  (2, 1): {2: 1}
+  }
+  
+  markovanalyze([1,2,1,2,3],4)
+  {
+  (1, 2, 1, 2, 3): {}
+  }
+  """
+  order += 1 # I originally thought 0th-order was actually 1st-order. Oops.
   if (order > len(seq)):
     raise Exception("Order was larger than sequence. You can't do that.")
 
@@ -227,8 +275,8 @@ def markovanalyze(seq, order):
   return pat
 
 def playbday(order, reps, rate, pat):
-  first = random.randint(0, len(pat)-order)#right?
-  past = pat[first:first+order]
+  first = random.randint(0, len(pat)-(order+1))
+  past = pat[first:first+order+1]
   print "first: %i len(pat): %i order: %i" % (first, len(pat), order)
   print "past: " + str(past)
   table = markovanalyze(pat, order)
@@ -238,15 +286,19 @@ def playbday(order, reps, rate, pat):
   dur = rate*1.5
   
   for i in range(reps):
-    nextkey = tuple(past[len(past)-order:])
+  
+    nextkey = tuple(past[len(past)-(order+1):])
     print "nextkey: " + str(nextkey)
     note = selectNextFromDict(table, nextkey)
+    if (note == ()): #hit the end of the line
+      return
     print "note to play: " + str(note)
     past.append(note)
     print "updated past: " + str(past)
     STRUM2(timepoint, dur, 10000, keynumToHertz(note), 1, 1.0, 0.5)
     timepoint = timepoint + rate
     
+#change the seed to anything, or remove it. It's just nice to have consistent results
 random.seed(1)
 #markovRhythms(100, .4, rhydict)
 #markovRhythms(100, .4, rhydict2)
@@ -264,7 +316,7 @@ random.seed(1)
 #bw(120, 60, .125, bwoctaves2, bwintervals)
 #bw(120*21/13, 48, .125*13./21., bwoctaves2, bwintervals)
 
-playbday(5, 25, .25, bday)
+playbday(2, 25, .25, grace)
 #print markovanalyzeFirstOrder([1,2,1,2,3],1)
-#print markovanalyze(bday,3)
+#print markovanalyze([1,2,1,2,3],0)  
 
