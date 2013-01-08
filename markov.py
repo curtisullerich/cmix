@@ -120,7 +120,8 @@ def selectNextFromDict(table, past):
       print "return " + str(key)
       return key
   #give up and return the last one
-  return table.items().pop()
+  raise Exception("didn't work!")
+  #return table.items().pop()
 
 bwintervals = {
 0:{0:.5, 1:.2, 2:2., 3:.1, 4:1.5,5:1., 6:.1 ,7:.5, 8:.1, 9:.5, 10:.1, 11:.5},
@@ -166,9 +167,9 @@ def bw(length, octave, rate, octaves, intervals):
     reps -= 1
 
 bdaynames = ['c4', 'c', 'd', 'c', 'f', 'e', 'c', 'c', 'd', 'c', 'g', 'f', 'c', 'c', 'c5', 'a4', 'f', 'e', 'd', 'bf', 'bf', 'a', 'f', 'g', 'f']
-bday = [60, 60, 62, 60, 66, 64, 60, 60, 62, 60, 67, 66, 60, 60, 72, 69, 66, 64, 62, 70, 70, 69, 66, 67, 66]
+bday = [60, 60, 62, 60, 65, 64, 60, 60, 62, 60, 67, 65, 60, 60, 72, 69, 66, 64, 62, 70, 70, 69, 66, 67, 66]
 
-def markovanalyze(seq, order):
+def markovanalyzeFirstOrder(seq, order):
   """first order first"""
   pat = dict()
   for i in range(len(seq)-1):
@@ -186,27 +187,7 @@ def markovanalyze(seq, order):
     pat[last] = {}
   return pat
 
-"""def mmarkovanalyze(seq, order):
-  
-  pat = dict()
-  prev = tuple(seq[0:order])
-  
-  for i in range(len(seq)-order):
-    if (tuple(seq[i:order+i]) in pat):
-      d = pat[tuple(seq[i:order+i])]
-      if (tuple(seq[i+1:order+i+1]) in d):
-        d[tuple(seq[i+1:order+i+1])] = d[tuple(seq[i+1:order+i+1])]+1
-      else:
-        d[tuple(seq[i+1:order+i+1])] = 1
-      pat[tuple(seq[i:order+i])] = d
-    else:
-      pat[tuple(seq[i:order+i])] =  {tuple(seq[i+1:order+i+1]):1}
-  last = tuple(seq[len(seq)-order:])
-  if (last not in pat):
-    pat[last] = {}
-  return pat"""
-
-def nmarkovanalyze(seq, order):
+def markovanalyze(seq, order):
   """nth order"""
   if (order > len(seq)):
     raise Exception("Order was larger than sequence. You can't do that.")
@@ -250,7 +231,7 @@ def playbday(order, reps, rate, pat):
   past = pat[first:first+order]
   print "first: %i len(pat): %i order: %i" % (first, len(pat), order)
   print "past: " + str(past)
-  table = nmarkovanalyze(pat, order)
+  table = markovanalyze(pat, order)
   print table
   print "reps: " + str(reps)
   timepoint = 0
@@ -284,6 +265,6 @@ random.seed(1)
 #bw(120*21/13, 48, .125*13./21., bwoctaves2, bwintervals)
 
 playbday(5, 25, .25, bday)
-#print markovanalyze([1,2,1,2,3],1)
-#print nmarkovanalyze(bday,3)
+#print markovanalyzeFirstOrder([1,2,1,2,3],1)
+#print markovanalyze(bday,3)
 
