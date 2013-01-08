@@ -72,7 +72,7 @@ def nameToNum(name):
 
   'a#':10,
   'bb':10,
-  'cbb':10,
+  'cbb':-2,
   
   'a##':11,
   'b':11,
