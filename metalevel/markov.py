@@ -2,6 +2,7 @@ from rtcmix import *
 from metalib import *
 import math
 import random
+from map import *
 #print_off()
 rtsetparams(44100, 2)
 load("STRUM2")
@@ -179,6 +180,17 @@ bday =      [  60,  60,  62,  60,  65,  64,  60,  60,  62,  60,  67,  65,  60,  
 amazinggracenames = ['G', 'C', 'C', 'E', 'D', 'C', 'E', 'E', 'D', 'C', 'A', 'G', 'G', 'C', 'C', 'E', 'D', 'C', 'E', 'D', 'E', 'G', 'E', 'G', 'G', 'E', 'D', 'C', 'E', 'E', 'D', 'C', 'A', 'G', 'G', 'G', 'C', 'C', 'E', 'D', 'C', 'E', 'D', 'C']
 grace = [67, 60, 60, 64, 62, 60, 64, 64, 62, 60, 69, 67, 67, 60, 60, 64, 62, 60, 64, 62, 64, 67, 64, 67, 67, 64, 62, 60, 64, 64, 62, 60, 69, 67, 67, 67, 60, 60, 64, 62, 60, 64, 62, 60]
 
+thing = ['e5', 'e5', 'd5', 'c5', 'c5', 'd5', 'd5', 'e5', 'd5', 'c5', 'g5', 'g5', 'f5', 'e5', 'e5', 'd5', 'c5', 'd5', 'e5', 'c5']
+thingint = []
+for note in thing:
+  thingint.append(nameToNum(note))
+
+thing2 = ['C4', 'E4', 'C4', 'E4', 'D#4', 'C4', 'E4', 'C4', 'E4', 'D#4', 'E4', 'C4', 'E4', 'D#4', 'E4', 'C4', 'E4', 'D#4', 'C4', 'E4']
+thingint2 = []
+for note in thing2:
+  thingint2.append(nameToNum(note))
+
+
 def playnotes(seq, rate):
   """Simple function that plays a sequence of notes (given as keynumbers)."""
   timepoint = 0
@@ -187,7 +199,7 @@ def playnotes(seq, rate):
     STRUM2(timepoint, dur, 10000, keynumToHertz(note), 1, 1.0, 0.5)
     timepoint += rate
 
-#playnotes(grace, .5)
+#playnotes(thingint, .5)
 
 def markovanalyzeZerothOrder(seq, order):
   """This is a basic implementation of zeroth-order markov chaining
@@ -274,27 +286,26 @@ def markovanalyze(seq, order):
     pat[last] = {}
   return pat
 
-def playbday(order, reps, rate, pat):
+def playbday(order, reps, rate, pat, dur):
   first = random.randint(0, len(pat)-(order+1))
   past = pat[first:first+order+1]
-  print "first: %i len(pat): %i order: %i" % (first, len(pat), order)
-  print "past: " + str(past)
+  #print "first: %i len(pat): %i order: %i" % (first, len(pat), order)
+  #print "past: " + str(past)
   table = markovanalyze(pat, order)
-  print table
-  print "reps: " + str(reps)
+  #print table
+  #print "reps: " + str(reps)
   timepoint = 0
-  dur = rate*1.5
   
   for i in range(reps):
   
     nextkey = tuple(past[len(past)-(order+1):])
-    print "nextkey: " + str(nextkey)
+    #print "nextkey: " + str(nextkey)
     note = selectNextFromDict(table, nextkey)
     if (note == ()): #hit the end of the line
       return
-    print "note to play: " + str(note)
+    #print "note to play: " + str(note)
     past.append(note)
-    print "updated past: " + str(past)
+    #print "updated past: " + str(past)
     STRUM2(timepoint, dur, 10000, keynumToHertz(note), 1, 1.0, 0.5)
     timepoint = timepoint + rate
     
@@ -316,7 +327,15 @@ random.seed(1)
 #bw(120, 60, .125, bwoctaves2, bwintervals)
 #bw(120*21/13, 48, .125*13./21., bwoctaves2, bwintervals)
 
-playbday(2, 25, .25, grace)
+#playbday(0, 25, .5, bday, .75)
+#playbday(0, 25, .5, grace, .75)
+#playbday(0, 50, .4, thingint, 1)
+#playbday(0, 1000, .04, thingint, 1)
+#playbday(0, 50, .2, thingint, 1)
+#playbday(1, 50, .2, thingint, 1)
+#playbday(2, 50, .2, thingint, 1)
+playbday(1, 50, .2, thingint2, 1)
+
 #print markovanalyzeFirstOrder([1,2,1,2,3],1)
 #print markovanalyze([1,2,1,2,3],0)  
 

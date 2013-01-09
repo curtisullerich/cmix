@@ -72,11 +72,11 @@ def nameToNum(name):
 
   'a#':10,
   'bb':10,
-  'cbb':-2,
+  'cbb':10,
   
   'a##':11,
   'b':11,
-  'cb':-1 #to handle edge case
+  'cb':11
   }.get(strippedname.lower(), None)
 
   if (pitchclass == None):
